@@ -1,0 +1,193 @@
+* {
+    box-sizing: border-box;
+    outline: 0;
+  }
+
+  :root {
+    height: 100%;
+    font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+    line-height: 1.5;
+    font-weight: 400;
+    font-synthesis: none;
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    height: 100%;
+    margin: 10px;;
+    display: flex;
+    background-color: rgba(121, 148, 237, 0.071);
+    flex-direction: column;
+  }
+
+  .list {
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    gap: 10px 0;
+  }
+
+  .list__item {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.15); /* Lighter background with more transparency */
+    backdrop-filter: blur(10px); /* Apply blur to create the glass effect */
+    -webkit-backdrop-filter: blur(10px); /* Safari support */
+    padding: 15px;
+    border-radius: 10px; /* Increase border radius for a smoother effect */
+    color: #001d29;
+    font-weight: 500;
+    font-size: 18px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    position: relative;
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Add a subtle border */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Add a subtle shadow for depth */
+  }
+  
+
+  .drag-handle{
+    transition: all 0.3s;
+  }
+
+  .drag-handle::after {
+    content: '⠿';
+    font-size: 25px;
+    color: #00000021;
+    transform: translateX(10px);
+    width: 50%;
+
+    transition: all 0.3s;
+  }
+
+  .drag-handle:hover::after {
+    content: '⠿';
+    font-size: 25px;
+    color: #000000;
+
+
+  }
+
+  .list__item.is-idle .drag-handle {
+    cursor: grab;
+
+  }
+
+  .list__item.is-idle {
+    transition: 0.25s ease transform;
+  }
+
+  .list__item.is-draggable,
+  .list__item.is-draggable .drag-handle {
+    cursor: grabbing;
+  }
+
+  .list__item.is-draggable {
+    z-index: 10;
+  }
+  .textarea {
+    width: 100%;
+    overflow: hidden;
+    resize: none; /* Disable browser default resize handle */
+    min-height: 20px;
+    box-sizing: border-box;
+    padding-left: 20px;
+  }
+
+  textarea {
+    border: solid rgba(128, 128, 128, 0.222) 1px;
+  }
+  .menu {
+    transform: translateX(-50px) translateY(25px);;
+    margin: 10px;
+    display: flex;
+    width: max-content;
+    padding: 10px;
+    border-radius: 10px;
+    z-index: 89;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.149);
+  }
+  .sub-menu {
+    transform: translateX(-60px) translateY(-30px);
+    position: absolute;
+    margin: 10px;
+    display: flex;
+    z-index: 13;
+    width: max-content;
+    padding: 10px;
+    border-radius: 10px;
+    background-color: rgb(255, 255, 255);
+    box-shadow: 0px 0px 20px 0px rgba(0, 0, 0, 0.149);
+  }
+  .actions {
+    display: flex;
+    flex-direction: column; /* Change to column layout for mobile */
+    align-items: flex-start; 
+    height: 100%;
+    align-content: center;
+    justify-content: center;
+    padding: 5px; /* Add padding for better spacing */
+  }
+  
+  .delete-item-btn {
+    transition: all 0.3s;
+    position: absolute;
+    right: 0;
+    background-color: rgb(255, 255, 255);
+    transform: translateY(-20px) translateX(10px);
+    border: red solid;
+    color: red;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 30px;
+    border-radius: 50px;
+       
+    margin-top: 5px; /* Add margin for better spacing between buttons */
+/* Allow width to adjust based on content */
+    height: auto; /* Allow height to adjust based on content */
+    padding: 0px; /* Add padding for better spacing */
+  }
+  .delete-item-btn:hover {
+    background-color: rgba(255, 0, 0, 0.316);
+}
+
+  
+
+.music .delete-item-btn, .comment .delete-item-btn {
+    transform: translateY(-60px) translateX(10px);
+
+    &:hover {
+        background-color: rgba(255, 0, 0, 0.316);
+        color: red;
+    }
+}
+
+
+.btn-primary {
+    color: rgb(67, 81, 127);
+    border: rgb(67, 81, 127) solid;
+    background-color: transparent;
+    border-radius: 10px;
+    margin: 5px;
+    outline: 0;
+}
+
+.btn-primary > svg {
+    transform: translateY(-1px);
+}
+.btn-primary:hover {
+    color: rgb(67, 81, 127);
+    border: rgb(67, 81, 127) solid;
+    background-color: rgba(67, 81, 127, 0.287);
+    border-radius: 10px;
+    margin: 5px;
+}
+textarea {
+    font-size: small;
+}
+

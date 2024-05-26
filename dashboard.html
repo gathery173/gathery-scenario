@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gathery Scenarios</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+
+
+
+  <div class="container">
+    <div class="list js-list" id="list">
+      <br>
+    </div>
+
+    <h2>Scenarios</h2>
+    <button class="btn btn-primary mt-3" data-toggle="modal" data-target="#addScenarioModal">Add Scenario</button>
+    <ul class="list-group" id="scenariosList">
+      <!-- Scenario items will be appended here -->
+    </ul>
+    
+  </div>
+
+  <!-- Add Scenario Modal -->
+  <div class="modal fade" id="addScenarioModal" tabindex="-1" role="dialog" aria-labelledby="addScenarioModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addScenarioModalLabel">Add New Scenario</h5>
+          <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+            <span aria-hidden="true">&times;</span>
+          </button>
+        </div>
+        <div class="modal-body">
+          <form id="addScenarioForm">
+            <div class="form-group">
+              <label for="scenarioName">Scenario Name</label>
+              <input type="text" class="form-control" id="scenarioName" required />
+            </div>
+          </form>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+          <button type="submit" class="btn btn-primary" form="addScenarioForm">Add Scenario</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modal for adding item (existing code) -->
+  <div class="modal fade" id="addItemModal" tabindex="-1" role="dialog" aria-labelledby="addItemModalLabel" aria-hidden="true">...</div>
+  <!-- Modal for adding actor (existing code) -->
+  <div class="modal fade" id="addActorModal" tabindex="-1" role="dialog" aria-labelledby="addActorModalLabel" aria-hidden="true">...</div>
+
+  <script type="module" src="./main.js"></script>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+</body>
+</html>
+<script type="module">
+const u = new URLSearchParams(window.location.search)
+  if (u.get("session") === "d56b699830e77ba53855679cb1d252da") {
+   
+  } else {
+   window.location.href = "./index.html"
+  
+
+  }
+  // main.js
+import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-app.js";
+import { getDatabase, ref, set, push, onValue, update, remove } from "https://www.gstatic.com/firebasejs/9.6.8/firebase-database.js";
+
+// Your web app's Firebase configuration
+const firebaseConfig = {
+    apiKey: "AIzaSyDnIGTQ1rt_6tSMXGUDLcX3WkZggMKcec0",
+    authDomain: "gathery-53f8c.firebaseapp.com",
+    databaseURL: "https://gathery-53f8c-default-rtdb.firebaseio.com",
+    projectId: "gathery-53f8c",
+    storageBucket: "gathery-53f8c.appspot.com",
+    messagingSenderId: "149464461222",
+    appId: "1:149464461222:web:038bae0c2424df59552967",
+    measurementId: "G-LHXSGJSZ60"
+  };
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+const database = getDatabase(app);
+
+document.addEventListener("DOMContentLoaded", function () {
+  loadScenarios();
+  setupScenarioForm();
+
+  const textareas = document.querySelectorAll(".resize-ta");
+  textareas.forEach((textarea) => {
+    textarea.addEventListener("input", () => autoResizeTextarea(textarea));
+    autoResizeTextarea(textarea); // Initial resize to fit content
+  });
+
+  document.querySelectorAll(".add-actor-btn").forEach((button) => {
+    button.addEventListener("click", () => {
+      $("#addActorModal").modal("show");
+    });
+  });
+
+  document
+    .getElementById("addActorForm")
+    .addEventListener("submit", function (e) {
+      e.preventDefault();
+      const actorNameInput = document.getElementById("actorName");
+      const actorName = actorNameInput.value.trim();
+      if (actorName) {
+        addActorToStorage(actorName);
+        actorNameInput.value = "";
+        $("#addActorModal").modal("hide");
+      }
+    });
+
+  document.querySelectorAll('.breadcrumb-item a').forEach(item => {
+    item.addEventListener('click', function(event) {
+      event.preventDefault(); // Prevent default link behavior
+      changeBreadcrumbName(this);
+    });
+  });
+});
+
+function autoResizeTextarea(textarea) {
+  textarea.style.height = "auto";
+  textarea.style.height = textarea.scrollHeight + "px";
+}
+
+function loadScenarios() {
+  const scenariosList = $("#scenariosList");
+  const scenariosRef = ref(database, 'scenarios');
+  onValue(scenariosRef, (snapshot) => {
+    scenariosList.empty(); // Clear the list
+    snapshot.forEach((childSnapshot) => {
+      const scenario = childSnapshot.val();
+      const scenarioItem = $("<li>")
+        .addClass("list-group-item d-flex justify-content-between align-items-center")
+        .attr("data-id", scenario.id)
+        .html(`
+          ${scenario.name}
+          <div class="dropdown">
+            <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">⋮</button>
+            <div class="dropdown-menu dropdown-menu-right" aria-labelledby="dropdownMenuButton">
+              <a class="dropdown-item edit-scenario" href="#">Edit</a>
+              <a class="dropdown-item rename-scenario" href="#" >Rename</a>
+              <a class="dropdown-item print-scenario" href="#">Print</a>
+              <a class="dropdown-item share-scenario" href="#">Share</a>
+              <a class="dropdown-item delete-scenario" href="#" >Delete</a>
+            </div>
+          </div>
+        `);
+      scenariosList.append(scenarioItem);
+    });
+
+    // Add event listener for edit scenario
+    $(".edit-scenario").click(function(event) {
+      event.preventDefault();
+      const scenarioItem = $(this).closest(".list-group-item");
+      const scenarioId = scenarioItem.data("id");
+      
+      window.location.href = `./scenario.html?id=${scenarioId}`
+     // const scenarioName = prompt("Edit Scenario Name:", scenarioItem.text().trim());
+      if (scenarioName) {
+        const scenarioRef = ref(database, 'scenarios/' + scenarioId);
+        //update(scenarioRef, { name: scenarioName });
+       // scenarioItem.text(scenarioName);
+      }
+    });
+
+    $(".rename-scenario").click(function(event) {
+      event.preventDefault();
+      const scenarioItem = $(this).closest(".list-group-item");
+      const scenarioId = scenarioItem.data("id");
+      console.log(scenarioItem.contents().get(0).nodeValue.trim())
+      const newN = prompt("New name : ")
+         update(ref(database, `scenarios/${scenarioId}`), {name: newN})
+    })
+
+    $(".print-scenario").click(function(event) {
+      event.preventDefault();
+      const scenarioItem = $(this).closest(".list-group-item");
+      console.log(scenarioItem.data("id"))
+      window.location.href = `gathery-scenarios.pages.dev/print.html?id=${scenarioItem.data("id")}`;
+    })
+
+    $(".share-scenario").click(function(event) {
+      event.preventDefault();
+      const scenarioItem = $(this).closest(".list-group-item");
+      console.log(scenarioItem.data("id"))
+      const textToCopy = `gathery-scenarios.pages.dev/share.html?id=${scenarioItem.data("id")}`;
+      navigator.clipboard.writeText(textToCopy).then(() => {
+        console.log('Text copied to clipboard');
+        alert('Text copied to clipboard: ' + textToCopy);
+      }).catch(err => {
+        console.error('Failed to copy text: ', err);
+      });
+    }
+
+  )
+
+    $(".delete-scenario").click(function(event) {
+      event.preventDefault();
+      const scenarioItem = $(this).closest(".list-group-item");
+      const scenarioId = scenarioItem.data("id");
+      console.log(scenarioItem.contents().get(0).nodeValue.trim())
+      if (confirm(`Do you really want to delete \"${scenarioItem.contents().get(0).nodeValue.trim()}\"`)){
+         remove(ref(database, `scenarios/${scenarioId}`))
+      }
+      
+     // const scenarioName = prompt("Edit Scenario Name:", scenarioItem.text().trim());
+      if (scenarioName) {
+        const scenarioRef = ref(database, 'scenarios/' + scenarioId);
+        //update(scenarioRef, { name: scenarioName });
+       // scenarioItem.text(scenarioName);
+      }
+    });
+  });
+  }
+
+function deleteScenario(element) {
+  const scenarioItem = element.closest(".list-group-item");
+  console.log(scenarioItem)
+}
+
+function setupScenarioForm() {
+  document.getElementById("addScenarioForm").addEventListener("submit", function (e) {
+    e.preventDefault();
+    const scenarioNameInput = document.getElementById("scenarioName");
+    const scenarioName = scenarioNameInput.value.trim();
+    if (scenarioName) {
+      addScenario(scenarioName);
+      scenarioNameInput.value = "";
+      $("#addScenarioModal").modal("hide");
+    }
+  });
+}
+
+function addScenario(name) {
+  const scenariosRef = ref(database, 'scenarios');
+  const newScenarioRef = push(scenariosRef);
+  set(newScenarioRef, {
+    id: newScenarioRef.key,
+    name: name
+  });
+
+  loadScenarios()
+}
+
+function editScenario(element) {
+  const scenarioItem = element.closest(".list-group-item");
+  const scenarioId = scenarioItem.dataset.id;
+  console.log(scenarioItem)
+  //const scenarioName = prompt("Edit Scenario Name:", scenarioItem.firstChild.textContent.trim());
+  //if (scenarioName) {
+
+  //  const scenarioRef = ref(database, 'scenarios/' + scenarioId);
+ //   update(scenarioRef, {
+ //     name: scenarioName
+  //  });
+  //  console.log(scenarioId)
+  //  scenarioItem.firstChild.textContent = scenarioName;
+  
+  //}
+}
+
+function changeBreadcrumbName(element) {
+  const activeBreadcrumb = document.querySelector('.breadcrumb-item.active');
+  if (activeBreadcrumb) {
+    activeBreadcrumb.textContent = "jhh";
+  }
+  activeBreadcrumb.textContent = "jhh";
+}
+</script>
+<style>
+
+</style>
+<style>
+  .btn.btn-secondary {
+    background: transparent;
+    border: none;
+    color: black;
+    outline: 0px;
+  }
+  .btn.btn-secondary:focus:active {
+    background: transparent;
+    border: none;
+    color: black;
+    outline: 0px;
+  }
+  .btn.btn-secondary:focus {
+    background: transparent;
+    border: none;
+    color: black;
+    outline: 0px;
+  }
+  .dropdown-toggle::after {
+    content: none;
+}
+</style>

@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Auto-Opening Undismissable Login Modal</title>
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css">
+  <style>
+    /* Prevent closing modal when clicking outside of it */
+    .modal-backdrop {
+      opacity: 1 !important;
+    }
+    .modal {
+      pointer-events: auto;
+    }
+  </style>
+</head>
+<body>
+  <!-- Modal -->
+  <div class="modal fade" id="loginModal" tabindex="-1" role="dialog" aria-labelledby="loginModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+      <div class="modal-content">
+        <div class="modal-header d-flex">
+          <h5 class="modal-title mx-auto" id="loginModalLabel">Gathery Scenarios</h5>
+        </div>
+        <div class="modal-body">
+          
+          You don't have acces to this page
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"></script>
+  <script src="
+https://cdn.jsdelivr.net/npm/js-md5@0.8.3/src/md5.min.js
+"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js"></script>
+  <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"></script>
+  <script>
+    if (new URLSearchParams(window.location.search).get("key") === "d56b699830e77ba53855679cb1d252da") {
+        window.location.href = "./dashboard.html?session=d56b699830e77ba53855679cb1d252da"
+    } else {
+        $(document).ready(function() {
+      // Show the modal when the page loads
+      $('#loginModal').modal('show');
+    });
+    
+    // Prevent form submission from closing the modal
+    $('#loginForm').on('submit', function(event) {
+      event.preventDefault();
+      alert('Form submitted!');
+    });
+    }
+    
+    console.log(md5("login"))
+  </script>
+</body>
+</html>
